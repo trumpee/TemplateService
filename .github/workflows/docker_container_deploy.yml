@@ -45,6 +45,7 @@ jobs:
                         echo "Running container: trumpee-${{ env.lowercase_repo_name }}:${{ github.event.inputs.image_tag }}"
                         echo "Container name: $safe_container_name"
                         docker run -d \
+                        -p 22002:8080 \
                         --restart unless-stopped \
                         --name $safe_container_name \
                         ghcr.io/trumpee/trumpee-${{ env.lowercase_repo_name }}:${{ github.event.inputs.image_tag}}
