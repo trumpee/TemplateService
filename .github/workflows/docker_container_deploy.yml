@@ -1,0 +1,50 @@
+name: Deploy to DROPLET
+
+on:
+    workflow_dispatch:
+        inputs:
+            image_tag:
+                description: 'Choose a tag:'
+                required: true
+                type: string
+                default: 'latest'
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        permissions: write-all
+        steps:
+            -   name: Convert Repository Name to Lowercase
+                run: |
+                    lowercase_name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+                    echo "lowercase_repo_name=$lowercase_name" >> $GITHUB_ENV
+
+            -   name: Deploy infra to DROPLET
+                uses: appleboy/ssh-action@master
+                with:
+                    passphrase: ${{ secrets.SSH_PASSPHRASE }}
+                    host: ${{ secrets.DROPLET_HOST }}
+                    username: ${{ secrets.DROPLET_USERNAME }}
+                    key: ${{ secrets.DROPLET_KEY }}
+                    script: |
+                        # Check if previous container exists and is running (based on name)
+                        existing_container_id=$(docker ps -aqf "name=trumpee-${{ env.lowercase_repo_name }}-${{ github.event.inputs.image_tag }}")
+                        if [ -n "$existing_container_id" ]; then
+                        echo "Stopping existing container: trumpee-${{ env.lowercase_repo_name }}-${{ github.event.inputs.image_tag }}"
+                        docker stop $existing_container_id
+                        docker rm $existing_container_id
+                        fi
+                        
+                        # Pull with explicit tag (or default to 'latest')
+                        docker login ghcr.io -u bardin08 -p ${{ secrets.GITHUB_TOKEN }}
+                        echo "Pulling image: ghcr.io/trumpee/trumpee-${{ env.lowercase_repo_name }}:${{ github.event.inputs.image_tag }}"
+                        docker pull ghcr.io/trumpee/trumpee-${{ env.lowercase_repo_name }}:${{ github.event.inputs.image_tag }}
+                        
+                        # Run with the specified tag, restart policy, and optional ports
+                        safe_container_name=$(echo "trumpee-${{ env.lowercase_repo_name }}-${{ github.event.inputs.image_tag }}" | tr -dc 'a-zA-Z0-9-_')
+                        echo "Running container: trumpee-${{ env.lowercase_repo_name }}:${{ github.event.inputs.image_tag }}"
+                        echo "Container name: $safe_container_name"
+                        docker run -d \
+                        --restart unless-stopped \
+                        --name $safe_container_name \
+                        ghcr.io/trumpee/trumpee-${{ env.lowercase_repo_name }}:${{ github.event.inputs.image_tag}}
