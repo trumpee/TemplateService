@@ -32,4 +32,4 @@ COPY --from=publish /app/publish .
 ARG SOLUTION_NAME
 ENV SOLUTION_NAME=$SOLUTION_NAME
 
-ENTRYPOINT ["dotnet", "$SOLUTION_NAME.dll"]
+ENTRYPOINT ["dotnet", "${SOLUTION_NAME}.dll"]
