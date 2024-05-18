@@ -18,6 +18,9 @@ FROM build AS publish
 RUN dotnet publish "$SOLUTION_NAME.sln" -c Release -o /app/publish
 
 FROM base AS final
+
+ARG SOLUTION_NAME
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "$SOLUTION_NAME.dll"]
