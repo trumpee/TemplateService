@@ -28,8 +28,4 @@ RUN dotnet publish "$SOLUTION_NAME.sln" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-ARG SOLUTION_NAME
-ENV SOLUTION_NAME=$SOLUTION_NAME
-
-ENTRYPOINT ["dotnet", "${SOLUTION_NAME}.dll"]
+ENTRYPOINT ["dotnet", "TemplateService.dll"]
