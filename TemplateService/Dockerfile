@@ -23,7 +23,7 @@ RUN dotnet restore "$SOLUTION_NAME.sln" \
 RUN dotnet build "$SOLUTION_NAME.sln" -c Release -o /app/build --no-restore
 
 FROM build AS publish
-RUN dotnet publish "$SOLUTION_NAME.sln" -c Release -o /app/publish
+RUN dotnet publish "$SOLUTION_NAME.sln" -c Release -o /app/publish --self-contained -r linux-x64
 
 FROM base AS final
 WORKDIR /app
