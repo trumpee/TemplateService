@@ -16,7 +16,7 @@ jobs:
               with:
                   files: '**/appsettings.json'
               env:
-                MassTransit.Transport.Port: 23501
+                MassTransit.Transport.Port: 5672
                 MassTransit.Transport.Username: ${{ secrets.RABBITMQ_USERNAME }}
                 MassTransit.Transport.Password: ${{ secrets.RABBITMQ_PASSWORD }}                # configure your variables substitution here
 
