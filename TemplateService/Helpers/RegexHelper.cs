@@ -10,7 +10,7 @@ internal static partial class RegexHelper
     /// <summary>
     /// Gets the regular expression for matching variable names.
     /// </summary>
-    internal static Regex VariableRegex = VariableRegexPrecompiled();
+    internal static readonly Regex VariableRegex = VariableRegexPrecompiled();
 
     /// <summary>
     /// Compiles the regular expression for matching variable names.
